@@ -6,6 +6,7 @@ const {
   getContactById,
   removeContact,
   addContact,
+  updateContact,
 } = require("../../models/contacts");
 const router = express.Router();
 
@@ -25,7 +26,9 @@ router.get("/", async (req, res, next) => {
 });
 
 router.get("/:contactId", async (req, res, next) => {
-  res.json({ message: "template message" });
+  const { contactId } = req.params;
+  const contact = await getContactById(contactId);
+  res.json(contact);
 });
 
 router.post("/", validateBody(schemaAdd), async (req, res, next) => {
@@ -39,11 +42,16 @@ router.post("/", validateBody(schemaAdd), async (req, res, next) => {
 });
 
 router.delete("/:contactId", async (req, res, next) => {
-  res.json({ message: "template message" });
+  const { contactId } = req.params;
+  const deleteContact = await removeContact(contactId);
+  res.json(deleteContact);
 });
 
 router.put("/:contactId", async (req, res, next) => {
-  res.json({ message: "template message" });
+  const { contactId } = req.params;
+  const { ...body } = req.body;
+  const changeContactPhone = await updateContact(contactId, body);
+  res.json(changeContactPhone);
 });
 
 module.exports = router;

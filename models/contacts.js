@@ -1,6 +1,6 @@
 const fs = require("fs/promises");
 const path = require("path");
-var uniqid = require("uniqid");
+const uniqid = require("uniqid");
 
 const contactsPath = path.join(__dirname, "contacts.json");
 
@@ -14,7 +14,7 @@ async function getContactById(contactId) {
   const list = await listContacts();
   const contact = list.find((item) => item.id === contactId);
   if (!contact) {
-    return null;
+    return "Not found";
   }
   return contact;
 }
@@ -35,10 +35,17 @@ async function addContact(name, email, phone) {
   await fs.writeFile(contactsPath, contactsList);
   return newContact;
 }
-
+async function updateContact(contactId, body) {
+  const list = await listContacts();
+  const contact = list.findIndex((item) => item.id === contactId);
+  list[contact] = { contactId, ...body };
+  await fs.writeFile(contactsPath, JSON.stringify(list));
+  return list[contact];
+}
 module.exports = {
   listContacts,
   getContactById,
   removeContact,
   addContact,
+  updateContact,
 };
