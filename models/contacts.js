@@ -13,15 +13,15 @@ async function listContacts() {
 async function getContactById(contactId) {
   const list = await listContacts();
   const contact = list.find((item) => item.id === contactId);
-  if (!contact) {
-    return "Not found";
-  }
-  return contact;
+  return contact || null;
 }
 
 async function removeContact(contactId) {
   const list = await listContacts();
   const contactIndex = list.findIndex((item) => item.id === contactId);
+  if (contactIndex === -1) {
+    return null;
+  }
   const removeContact = list[contactIndex];
   const newContact = list.filter((_, index) => index !== contactIndex);
   await fs.writeFile(contactsPath, JSON.stringify(newContact));
@@ -35,17 +35,24 @@ async function addContact(name, email, phone) {
   await fs.writeFile(contactsPath, contactsList);
   return newContact;
 }
-async function updateContact(contactId, body) {
+const updateContact = async (list) =>
+  await fs.writeFile(contactsPath, JSON.stringify(list, null, 2));
+
+async function updateContactById(contactId, { name, email, phone }) {
   const list = await listContacts();
-  const contact = list.findIndex((item) => item.id === contactId);
-  list[contact] = { contactId, ...body };
-  await fs.writeFile(contactsPath, JSON.stringify(list));
-  return list[contact];
+  const contactIndex = list.findIndex((item) => item.id === contactId);
+  if (contactIndex === -1) {
+    return null;
+  }
+  list[contactIndex] = { contactId, name, email, phone };
+  await updateContact(list);
+  return list[contactIndex];
 }
+
 module.exports = {
   listContacts,
   getContactById,
   removeContact,
   addContact,
-  updateContact,
+  updateContactById,
 };
