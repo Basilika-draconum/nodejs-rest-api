@@ -8,8 +8,9 @@ const {
   getCurrentUser,
   logoutUser,
   updateSubscriptionUser,
+  updateAvatarUser,
 } = require("../../controllers/auth");
-const { authenticate } = require("../../middlewares");
+const { authenticate, upload } = require("../../middlewares");
 
 router.post(
   "/users/register",
@@ -29,4 +30,12 @@ router.patch(
   validateBody(schemas.updateSubscriptionSchema),
   updateSubscriptionUser
 );
+
+router.patch(
+  "/users/avatars",
+  authenticate,
+  upload.single("avatar"),
+  updateAvatarUser
+);
+
 module.exports = router;
